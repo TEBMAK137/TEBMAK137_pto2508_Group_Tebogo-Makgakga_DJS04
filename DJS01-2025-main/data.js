@@ -928,3 +928,230 @@ export const seasons = [
     ],
   },
 ];
+/ Helper: get genre titles from genre IDs
+      function getGenreTitles(genreIds) {
+        return genreIds.map((id) => {
+          const g = genresData.find((gen) => gen.id === id);
+          return g ? g.title : "General";
+        });
+      }
+
+      /**
+       * Format ISO date to human readable (MMM DD, YYYY)
+       * @param {string} isoDate - ISO date string
+       * @returns {string} formatted date
+       */
+      function formatDateReadable(isoDate) {
+        const date = new Date(isoDate);
+        return date.toLocaleDateString("en-US", {
+          year: "numeric",
+          month: "short",
+          day: "numeric",
+        });
+      }
+
+      /**
+       * Safe escape HTML
+       * @param {string} str
+       * @returns {string}
+       */
+      function escapeHtml(str) {
+        if (!str) return "";
+        return str.replace(/[&<>]/g, function (m) {
+          if (m === "&") return "&amp;";
+          if (m === "<") return "&lt;";
+          if (m === ">") return "&gt;";
+          return m;
+        });
+      }
+
+      /**
+       * Get season details for a podcast id
+       * @param {string} podcastId
+       * @returns {Array} season list with title & episodes
+       */
+      function getSeasonsForPodcast(podcastId) {
+        const found = seasonsDetails.find((s) => s.id === podcastId);
+        return found
+          ? found.seasonDetails
+          : [{ title: "Season 1", episodes: 0 }];
+      }
+
+      // ----- Render podcast card (Landing page preview) -----
+      /**
+       * Creates HTML for a single podcast card preview
+       * @param {Object} podcast
+       * @returns {string}
+       */
+      function renderPodcastCard(podcast) {
+        const updatedHuman = formatDateReadable(podcast.updated);
+        const genreTitles = getGenreTitles(podcast.genres);
+        const genreTagsHtml = genreTitles
+          .slice(0, 2)
+          .map((g) => `<span class="genre-tag">${escapeHtml(g)}</span>`)
+          .join("");
+        const extraGenre =
+          genreTitles.length > 2
+            ? `<span class="genre-tag">+${genreTitles.length - 2}</span>`
+            : "";
+        return `
+      <div class="podcast-card" data-id="${podcast.id}">
+        <img class="card-img" src="${podcast.image}" alt="Cover for ${escapeHtml(podcast.title)}" loading="lazy">
+        <div class="card-content">
+          <div class="card-title">${escapeHtml(podcast.title)}</div>
+          <div class="card-meta">
+            <span class="badge seasons-badge">📺 ${podcast.seasons} Season${podcast.seasons !== 1 ? "s" : ""}</span>
+          </div>
+          <div class="genre-list">${genreTagsHtml} ${extraGenre}</div>
+          <div class="updated-text"><span>🕒 Updated: ${updatedHuman}</span></div>
+        </div>
+      </div>
+    `;
+      }
+
+      /**
+       * Render entire podcast grid
+       * @param {Array} shows
+       */
+      function renderLandingPage(shows) {
+        const grid = document.getElementById("podcastGrid");
+        if (!grid) return;
+        if (!shows.length) {
+          grid.innerHTML =
+            '<div class="loading-placeholder">No podcasts found.</div>';
+          return;
+        }
+        const cardsHtml = shows.map((show) => renderPodcastCard(show)).join("");
+        grid.innerHTML = cardsHtml;
+      }
+
+      // ----- MODAL DETAILS (full OOP Modal Manager) -----
+      /**
+       * Build full modal content for a show (including season titles & episodes)
+       * @param {Object} podcast
+       * @returns {string}
+       */
+      function buildModalContent(podcast) {
+        const updatedHuman = formatDateReadable(podcast.updated);
+        const genreTitles = getGenreTitles(podcast.genres);
+        const genreTagsHtml = genreTitles
+          .map(
+            (g) =>
+              `<span class="genre-tag" style="background:#ede9fe;">${escapeHtml(g)}</span>`,
+          )
+          .join("");
+        const seasonsData = getSeasonsForPodcast(podcast.id);
+        let seasonsHtml = `<div class="season-list"><h4 style="margin-bottom: 0.8rem;">📅 Seasons & Episodes</h4>`;
+        if (seasonsData.length) {
+          seasonsData.forEach((season) => {
+            seasonsHtml += `
+          <div class="season-item">
+            <span class="season-name">🎧 ${escapeHtml(season.title)}</span>
+            <span class="season-episodes">${season.episodes} episodes</span>
+          </div>
+        `;
+          });
+        } else {
+          seasonsHtml += `<p>Season details coming soon.</p>`;
+        }
+        seasonsHtml += `</div>`;
+        return `
+      <div class="modal-header">
+        <img class="modal-cover" src="${podcast.image}" alt="${escapeHtml(podcast.title)} cover">
+        <div class="modal-title-section">
+          <div class="modal-title">${escapeHtml(podcast.title)}</div>
+          <div class="meta-detail-row">
+            <span class="badge seasons-badge">⭐ ${podcast.seasons} Seasons</span>
+            <span class="badge">📅 Updated: ${updatedHuman}</span>
+          </div>
+          <div class="genre-list" style="margin-top: 0.4rem;">${genreTagsHtml}</div>
+        </div>
+      </div>
+      <div class="modal-description"><strong>📖 About the show</strong><br>${escapeHtml(podcast.description)}</div>
+      ${seasonsHtml}
+    `;
+      }
+
+      // ModalManager class (OOP, single responsibility)
+      class ModalManager {
+        /**
+         * @param {HTMLElement} overlayEl
+         * @param {HTMLElement} contentContainer
+         * @param {HTMLElement} closeBtn
+         */
+        constructor(overlayEl, contentContainer, closeBtn) {
+          this.overlay = overlayEl;
+          this.content = contentContainer;
+          this.closeBtn = closeBtn;
+          this.isOpen = false;
+          this._bindEvents();
+        }
+
+        _bindEvents() {
+          this.closeBtn.addEventListener("click", () => this.close());
+          this.overlay.addEventListener("click", (e) => {
+            if (e.target === this.overlay) this.close();
+          });
+          document.addEventListener("keydown", (e) => {
+            if (e.key === "Escape" && this.isOpen) this.close();
+          });
+        }
+
+        /**
+         * Opens modal with podcast details
+         * @param {Object} podcast
+         */
+        open(podcast) {
+          const modalHtml = buildModalContent(podcast);
+          this.content.innerHTML = modalHtml;
+          this.overlay.classList.add("active");
+          this.overlay.setAttribute("aria-hidden", "false");
+          document.body.style.overflow = "hidden";
+          this.isOpen = true;
+        }
+
+        close() {
+          this.overlay.classList.remove("active");
+          this.overlay.setAttribute("aria-hidden", "true");
+          document.body.style.overflow = "";
+          this.isOpen = false;
+          this.content.innerHTML = "";
+        }
+      }
+
+      // ----- Event Delegation for Cards (functional) -----
+      /**
+       * @param {Event} e
+       * @param {Array} shows
+       * @param {ModalManager} modalMgr
+       */
+      function onCardClick(e, shows, modalMgr) {
+        const card = e.target.closest(".podcast-card");
+        if (!card) return;
+        const id = card.getAttribute("data-id");
+        const foundShow = shows.find((show) => show.id === id);
+        if (foundShow) modalMgr.open(foundShow);
+      }
+
+      // ----- Initialize App -----
+      document.addEventListener("DOMContentLoaded", () => {
+        const grid = document.getElementById("podcastGrid");
+        const modalOverlay = document.getElementById("modalOverlay");
+        const modalContent = document.getElementById("modalContent");
+        const closeModal = document.getElementById("closeModalBtn");
+
+        if (!modalOverlay || !modalContent || !closeModal) return;
+
+        const modalManager = new ModalManager(
+          modalOverlay,
+          modalContent,
+          closeModal,
+        );
+        renderLandingPage(podcasts);
+
+        if (grid) {
+          grid.addEventListener("click", (e) =>
+            onCardClick(e, podcasts, modalManager),
+          );
+        }
+      });
