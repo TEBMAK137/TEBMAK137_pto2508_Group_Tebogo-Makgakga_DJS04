@@ -6,46 +6,28 @@
       name="viewport"
       content="width=device-width, initial-scale=1.0, viewport-fit=cover"
     />
-    <title>Vanilla JS Podcast App</title>
-    <link rel="stylesheet" href="Vanillastyle.css" />
+    <title>PodcastHub | Modular Podcast App</title>
+    <link rel="stylesheet" href="./styles.css" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <style src="Vanillastyle.css"></style>
   </head>
   <body>
-    <div class="app-container">
-      <!-- Header -->
-      <header class="app-header">
-        <h1>🎧 PodcastApp</h1>
-        <p class="subtitle">Find your next favorite show</p>
-      </header>
-
-      <!-- Filter Bar (search + dropdowns) -->
-      <div class="filter-bar">
-        <input
-          type="text"
-          id="searchInput"
-          class="search-input"
-          placeholder="Search podcasts..."
-        />
-        <div class="dropdown-group">
-          <select id="genreFilter" class="styled-dropdown">
-            <option value="all">All Genres</option>
-            <!-- Genres will be populated by JS -->
-          </select>
-          <select id="sortFilter" class="styled-dropdown">
-            <option value="recent">Recently Updated</option>
-            <option value="popular">Most Popular</option>
-            <option value="newest">Newest</option>
-          </select>
-        </div>
+    <div class="container">
+      <div class="app-header">
+        <h1>🎙️ PodcastHub</h1>
+        <p>Modular Web Components • Shadow DOM • Custom Events</p>
       </div>
-
-      <!-- Podcast Grid -->
-      <section id="podcastGrid" class="podcast-grid"></section>
+      <div id="podcastGrid" class="podcast-grid"></div>
+      <footer>© 2025 PodcastHub — Fully encapsulated podcast cards</footer>
     </div>
 
-    <!-- Modal Overlay (hidden by default) -->
+    <!-- Modal structure -->
     <div
-      class="modal-overlay"
       id="modalOverlay"
+      class="modal-overlay"
       aria-hidden="true"
       role="dialog"
       aria-modal="true"
@@ -54,10 +36,9 @@
         <button class="modal-close" id="closeModalBtn" aria-label="Close modal">
           &times;
         </button>
-        <div class="modal-inner" id="modalContent"></div>
+        <div id="modalContent" class="modal-inner"></div>
       </div>
     </div>
-
-    <script src="data.js"></script>
+    <script type="module" src="main.js"></script>
   </body>
 </html>
