@@ -26,3 +26,5 @@ A fully responsive podcast landing page built with **React**. It fetches live da
 ---
 
 ## 📁 Project Structure (Plain CSS version)
+
+http://localhost:5173/
