@@ -1,12 +1,11 @@
 import React from "react";
+import styles from "./EmptyState.module.css";
 
 export default function EmptyState() {
   return (
-    <div className="state-card">
+    <div className={styles.container}>
       <p>No podcasts found</p>
-      <p className="text-sm text-slate-500 mt-1">
-        Try refreshing the page later.
-      </p>
+      <p className={styles.sub}>Try adjusting your search or filters.</p>
     </div>
   );
 }
