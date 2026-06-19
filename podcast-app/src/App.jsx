@@ -1,64 +1,58 @@
-import React, { useState, useEffect, useCallback } from "react";
-import { fetchPodcastPreviews } from "./api/podcastApi";
-import PodcastGrid from "./components/PodcastGrid";
-import LoadingState from "./components/LoadingState";
-import ErrorState from "./components/ErrorState";
-import EmptyState from "./components/EmptyState";
+import React from 'react';
+import { PodcastProvider, usePodcast } from './context/PodcastContext';
+import Header from './components/Header';
+import SearchBar from './components/SearchBar';
+import SortSelect from './components/SortSelect';
+import GenreFilter from './components/GenreFilter';
+import PodcastGrid from './components/PodcastGrid';
+import Pagination from './components/Pagination';
+import LoadingState from './components/LoadingState';
+import ErrorState from './components/ErrorState';
+import styles from './App.module.css';
 
-function App() {
-  const [podcasts, setPodcasts] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+function AppContent() {
+  const {
+    podcasts,
+    totalPages,
+    currentPage,
+    setCurrentPage,
+    loading,
+    error,
+    searchTerm,
+    setSearchTerm,
+    sortBy,
+    setSortBy,
+    selectedGenres,
+    setSelectedGenres,
+  } = usePodcast();
 
-  const loadPodcasts = useCallback(async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      const data = await fetchPodcastPreviews();
-      setPodcasts(data);
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  useEffect(() => {
-    loadPodcasts();
-  }, [loadPodcasts]);
-
-  const sortedPodcasts = [...podcasts].sort(
-    (a, b) => new Date(b.updated) - new Date(a.updated),
-  );
+  if (loading) return <LoadingState />;
+  if (error) return <ErrorState message={error} onRetry={() => window.location.reload()} />;
 
   return (
-    <div className="app-container">
-      <header className="app-header">
-        <h1>🎙️ PodcastHub</h1>
-        <p>
-          Discover amazing podcasts – browse shows, genres, and latest updates
-        </p>
-      </header>
-
-      {loading && <LoadingState />}
-      {!loading && error && (
-        <ErrorState message={error} onRetry={loadPodcasts} />
-      )}
-      {!loading && !error && podcasts.length === 0 && <EmptyState />}
-      {!loading && !error && podcasts.length > 0 && (
-        <PodcastGrid
-          podcasts={sortedPodcasts}
-          onSelectPodcast={(podcast) => console.log("Selected", podcast)}
-        />
-      )}
-
-      <footer>
-        © 2026 PodcastHub — All data provided by the public podcast API
-      </footer>
+    <div className={styles.container}>
+      <Header />
+      <div className={styles.controls}>
+        <SearchBar value={searchTerm} onChange={setSearchTerm} />
+        <SortSelect value={sortBy} onChange={setSortBy} />
+      </div>
+      <GenreFilter selectedGenres={selectedGenres} onChange={setSelectedGenres} />
+      <PodcastGrid podcasts={podcasts} />
+      <Pagination
+        currentPage={currentPage}
+        totalPages={totalPages}
+        onPageChange={setCurrentPage}
+      />
     </div>
   );
 }
 
-// export default App;
+export default function App() {
+  return (
+    <PodcastProvider>
+      <AppContent />
+    </PodcastProvider>
+  );
+}
 
 export default App;

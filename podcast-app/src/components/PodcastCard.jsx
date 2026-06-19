@@ -1,30 +1,33 @@
 import React from "react";
-import { formatRelativeDate } from "../utils/dateFormatter";
+import { formatRelativeDate } from "../utils/formatDate";
+import styles from "./PodcastCard.module.css";
 
-export default function PodcastCard({ podcast, onSelect }) {
+export default function PodcastCard({ podcast }) {
   return (
-    <div className="podcast-card" onClick={() => onSelect(podcast)}>
+    <div className={styles.card}>
       <img
         src={podcast.image}
         alt={`${podcast.title} cover`}
-        className="card-image"
+        className={styles.image}
         loading="lazy"
       />
-      <div className="card-content">
-        <h3 className="card-title">{podcast.title}</h3>
-        <div className="card-badge">
-          📺 {podcast.seasons} Season{podcast.seasons !== 1 ? "s" : ""}
+      <div className={styles.content}>
+        <h3 className={styles.title}>{podcast.title}</h3>
+        <div className={styles.meta}>
+          <span className={styles.badge}>
+            📺 {podcast.seasons} Season{podcast.seasons !== 1 ? "s" : ""}
+          </span>
         </div>
-        <div className="genre-list">
+        <div className={styles.genres}>
           {podcast.genreNames.map((genre) => (
-            <span key={genre} className="genre-tag">
+            <span key={genre} className={styles.genreTag}>
               {genre}
             </span>
           ))}
         </div>
-        <div className="updated-text">
-          <span>🕒 Updated {formatRelativeDate(podcast.updated)}</span>
-        </div>
+        <p className={styles.updated}>
+          🕒 Updated {formatRelativeDate(podcast.updated)}
+        </p>
       </div>
     </div>
   );
