@@ -1,59 +1,38 @@
-/**
- * API interaction module for podcast data.
- * @module podcastApi
- */
+import js from "@eslint/js";
+import globals from "globals";
+import react from "eslint-plugin-react";
+import reactHooks from "eslint-plugin-react-hooks";
+import reactRefresh from "eslint-plugin-react-refresh";
 
-const API_BASE = "https://podcast-api.netlify.app";
-
-/**
- * Map genre IDs to human‑readable names (based on the original specification).
- * @constant
- * @type {Object<number, string>}
- */
-export const GENRE_MAP = {
-  1: "Personal Growth",
-  2: "Investigative Journalism",
-  3: "History",
-  4: "Comedy",
-  5: "Entertainment",
-  6: "Business",
-  7: "Fiction",
-  8: "News",
-  9: "Kids and Family",
-};
-
-/**
- * Normalises a raw podcast preview object.
- * Adds `genreNames` array by mapping genre IDs to names.
- * @param {Object} raw - Raw podcast data from the API.
- * @returns {Object} Normalised podcast object.
- */
-function normalizePodcast(raw) {
-  const genreIds = raw.genreIds ?? raw.genres ?? [];
-  return {
-    id: String(raw.id),
-    title: raw.title,
-    description: raw.description,
-    seasons: raw.seasons,
-    image: raw.image,
-    updated: raw.updated,
-    genreIds,
-    genreNames: genreIds.map((id) => GENRE_MAP[id] || "Unknown"),
-  };
-}
-
-/**
- * Fetches the list of podcast previews from the API.
- * @async
- * @returns {Promise<Array>} Array of normalised podcast objects.
- * @throws {Error} If the network request fails.
- */
-export async function fetchPodcastPreviews() {
-  const response = await fetch(API_BASE);
-  if (!response.ok) {
-    throw new Error(`HTTP error! status: ${response.status}`);
-  }
-  const data = await response.json();
-  if (!Array.isArray(data)) return [];
-  return data.map(normalizePodcast);
-}
+export default [
+  { ignores: ["dist"] },
+  {
+    files: ["**/*.{js,jsx}"],
+    languageOptions: {
+      ecmaVersion: 2020,
+      globals: globals.browser,
+      parserOptions: {
+        ecmaVersion: "latest",
+        ecmaFeatures: { jsx: true },
+        sourceType: "module",
+      },
+    },
+    settings: { react: { version: "18.3" } },
+    plugins: {
+      react,
+      "react-hooks": reactHooks,
+      "react-refresh": reactRefresh,
+    },
+    rules: {
+      ...js.configs.recommended.rules,
+      ...react.configs.recommended.rules,
+      ...react.configs["jsx-runtime"].rules,
+      ...reactHooks.configs.recommended.rules,
+      "react/jsx-no-target-blank": "off",
+      "react-refresh/only-export-components": [
+        "warn",
+        { allowConstantExport: true },
+      ],
+    },
+  },
+];
