@@ -1,16 +1,26 @@
 import React from "react";
 import styles from "./Pagination.module.css";
 
+/**
+ * Pagination component with numbered page buttons.
+ *
+ * @component
+ * @param {Object} props
+ * @param {number} props.currentPage - Active page number.
+ * @param {number} props.totalPages - Total number of pages.
+ * @param {Function} props.onPageChange - Handler called when page changes.
+ * @returns {JSX.Element|null}
+ */
 export default function Pagination({ currentPage, totalPages, onPageChange }) {
   if (totalPages <= 1) return null;
 
   const pages = Array.from({ length: totalPages }, (_, i) => i + 1);
   const maxVisible = 5;
-  let visible = pages;
+  let visiblePages = pages;
   if (totalPages > maxVisible) {
     const start = Math.max(1, currentPage - 2);
     const end = Math.min(totalPages, start + maxVisible - 1);
-    visible = pages.slice(start - 1, end);
+    visiblePages = pages.slice(start - 1, end);
   }
 
   return (
@@ -22,7 +32,7 @@ export default function Pagination({ currentPage, totalPages, onPageChange }) {
       >
         Previous
       </button>
-      {visible.map((page) => (
+      {visiblePages.map((page) => (
         <button
           key={page}
           onClick={() => onPageChange(page)}

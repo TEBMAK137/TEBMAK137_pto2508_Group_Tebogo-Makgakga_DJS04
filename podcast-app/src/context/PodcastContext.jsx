@@ -8,12 +8,19 @@ import React, {
 import { fetchAllPodcasts } from "../api/fetchPodcasts";
 import { SORT_OPTIONS, ITEMS_PER_PAGE } from "../utils/constants";
 
+/**
+ * Podcast context object.
+ * @type {React.Context}
+ */
 const PodcastContext = createContext(null);
 
 /**
  * Provider component that manages all podcast state.
+ *
+ * @component
  * @param {Object} props
- * @param {React.ReactNode} props.children
+ * @param {React.ReactNode} props.children - Child components.
+ * @returns {JSX.Element}
  */
 export function PodcastProvider({ children }) {
   const [allPodcasts, setAllPodcasts] = useState([]);
@@ -49,18 +56,21 @@ export function PodcastProvider({ children }) {
     setCurrentPage(1);
   }, [searchTerm, sortBy, selectedGenres]);
 
-  // Filter, search, sort
+  // Filter, search, sort pipeline
   const processed = useMemo(() => {
     let result = [...allPodcasts];
+
     if (searchTerm.trim()) {
       const term = searchTerm.toLowerCase();
       result = result.filter((p) => p.title.toLowerCase().includes(term));
     }
+
     if (selectedGenres.length) {
       result = result.filter((p) =>
         p.genreNames.some((g) => selectedGenres.includes(g)),
       );
     }
+
     switch (sortBy) {
       case SORT_OPTIONS.NEWEST:
         result.sort((a, b) => new Date(b.updated) - new Date(a.updated));
@@ -105,11 +115,14 @@ export function PodcastProvider({ children }) {
 
 /**
  * Hook to access the podcast context.
+ *
  * @returns {Object} Podcast state and setters.
  * @throws {Error} If used outside PodcastProvider.
  */
 export function usePodcast() {
   const ctx = useContext(PodcastContext);
-  if (!ctx) throw new Error("usePodcast must be used within PodcastProvider");
+  if (!ctx) {
+    throw new Error("usePodcast must be used within a PodcastProvider");
+  }
   return ctx;
 }

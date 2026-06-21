@@ -2,6 +2,14 @@ import React from "react";
 import { formatRelativeDate } from "../utils/formatDate";
 import styles from "./PodcastCard.module.css";
 
+/**
+ * Individual podcast preview card.
+ *
+ * @component
+ * @param {Object} props
+ * @param {Object} props.podcast - Normalised podcast data.
+ * @returns {JSX.Element}
+ */
 export default function PodcastCard({ podcast }) {
   return (
     <div className={styles.card}>

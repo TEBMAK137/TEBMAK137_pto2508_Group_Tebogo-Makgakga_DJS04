@@ -2,10 +2,19 @@ import React from "react";
 import { GENRE_MAP } from "../api/fetchPodcasts";
 import styles from "./GenreFilter.module.css";
 
+/**
+ * Multi‑select genre filter using toggle buttons.
+ *
+ * @component
+ * @param {Object} props
+ * @param {string[]} props.selectedGenres - Array of selected genre names.
+ * @param {Function} props.onChange - Handler called when selection changes.
+ * @returns {JSX.Element}
+ */
 export default function GenreFilter({ selectedGenres, onChange }) {
   const allGenres = Object.values(GENRE_MAP);
 
-  const toggle = (genre) => {
+  const toggleGenre = (genre) => {
     if (selectedGenres.includes(genre)) {
       onChange(selectedGenres.filter((g) => g !== genre));
     } else {
@@ -20,7 +29,7 @@ export default function GenreFilter({ selectedGenres, onChange }) {
         {allGenres.map((genre) => (
           <button
             key={genre}
-            onClick={() => toggle(genre)}
+            onClick={() => toggleGenre(genre)}
             className={`${styles.button} ${
               selectedGenres.includes(genre) ? styles.active : ""
             }`}
