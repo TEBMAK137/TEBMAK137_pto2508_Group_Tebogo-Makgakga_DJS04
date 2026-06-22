@@ -1,6 +1,12 @@
 import React from "react";
 import styles from "./Header.module.css";
 
+/**
+ * Header component displaying the app title and description.
+ *
+ * @component
+ * @returns {JSX.Element}
+ */
 export default function Header() {
   return (
     <header className={styles.header}>

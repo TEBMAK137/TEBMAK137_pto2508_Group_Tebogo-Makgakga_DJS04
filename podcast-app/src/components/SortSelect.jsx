@@ -2,6 +2,15 @@ import React from "react";
 import { SORT_OPTIONS } from "../utils/constants";
 import styles from "./SortSelect.module.css";
 
+/**
+ * Dropdown component for sorting podcasts.
+ *
+ * @component
+ * @param {Object} props
+ * @param {string} props.value - Current sort option.
+ * @param {Function} props.onChange - Handler called when selection changes.
+ * @returns {JSX.Element}
+ */
 export default function SortSelect({ value, onChange }) {
   return (
     <select

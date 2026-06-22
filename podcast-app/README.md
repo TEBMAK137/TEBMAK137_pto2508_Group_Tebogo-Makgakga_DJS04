@@ -18,12 +18,9 @@ Data is fetched from `https://podcast-api.netlify.app`.
 ```bash
 npm install
 npm run dev
-
 ```
 
----
-
-podcast-app/
+DJS04-SOLUTION-.../
 ├── .gitignore
 ├── eslint.config.js
 ├── index.html
@@ -35,16 +32,10 @@ podcast-app/
 ├── api/
 │ └── fetchPodcasts.js
 ├── components/
-│ ├── EmptyState.jsx
-│ ├── EmptyState.module.css
-│ ├── ErrorState.jsx
-│ ├── ErrorState.module.css
 │ ├── GenreFilter.jsx
 │ ├── GenreFilter.module.css
 │ ├── Header.jsx
 │ ├── Header.module.css
-│ ├── LoadingState.jsx
-│ ├── LoadingState.module.css
 │ ├── Pagination.jsx
 │ ├── Pagination.module.css
 │ ├── PodcastCard.jsx
@@ -65,7 +56,3 @@ podcast-app/
 ├── data.js
 ├── index.css
 └── main.jsx
-
-```
-
-```
